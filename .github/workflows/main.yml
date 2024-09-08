@@ -1,3 +1,11 @@
+name: Build and Push Docker Images
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -44,3 +52,4 @@ jobs:
           docker-compose -f docker-compose.yml push
         env:
           MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_ROOT_PASSWORD }}
+          SPRING_DATASOURCE_PASSWORD: ${{ secrets.SPRING_DATASOURCE_PASSWORD }}
