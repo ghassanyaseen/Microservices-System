@@ -1,0 +1,62 @@
+version: '3.8'
+services:
+  my-mango:
+    image: mongo
+    environment:
+      MONGO_INITDB_DATABASE: ghassandatabase
+    volumes:
+      - mongo-data:/data/db
+      - mongo-config:/data/configdb
+
+  my-mysql-db:
+    image: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: 123456$
+      MYSQL_DATABASE: ghassandatabase
+    volumes:
+      - mysql-db:/var/lib/mysql
+
+  my-analytics:
+    build:
+      context: ./Analytics
+    depends_on:
+      - my-mysql-db
+      - my-mango
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://my-mysql-db/ghassandatabase
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: 123456$
+      SPRING_DATA_MONGODB_URI: mongodb://my-mango:27017/ghassandatabase
+
+  data-entry:
+    build:
+      context: ./Data-Entry
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://my-mysql-db/ghassandatabase
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: 123456$
+    depends_on:
+      - my-mysql-db
+      - my-authentication
+
+  my-show-data:
+    build:
+      context: ./ShowData
+    ports:
+      - "8083:8083"
+    environment:
+      SPRING_DATA_MONGODB_URI: mongodb://my-mango:27017/ghassandatabase
+    depends_on:
+      - my-mango
+      - my-authentication
+
+  my-authentication:
+    build:
+      context: ./Authentication
+
+volumes:
+  mysql-db:
+  mongo-data:
+  mongo-config:
