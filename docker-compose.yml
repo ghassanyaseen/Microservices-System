@@ -17,6 +17,7 @@ services:
       - mysql-db:/var/lib/mysql
 
   my-analytics:
+    image: ghassanyaseen/my-analytics:latest
     build:
       context: ./Analytics
     depends_on:
@@ -29,6 +30,7 @@ services:
       SPRING_DATA_MONGODB_URI: mongodb://my-mango:27017/ghassandatabase
 
   data-entry:
+    image: ghassanyaseen/data-entry:latest
     build:
       context: ./Data-Entry
     ports:
@@ -42,6 +44,7 @@ services:
       - my-authentication
 
   my-show-data:
+    image: ghassanyaseen/my-show-data:latest
     build:
       context: ./ShowData
     ports:
@@ -53,6 +56,7 @@ services:
       - my-authentication
 
   my-authentication:
+    image: ghassanyaseen/my-authentication:latest
     build:
       context: ./Authentication
 
