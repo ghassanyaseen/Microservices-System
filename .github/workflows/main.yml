@@ -50,6 +50,3 @@ jobs:
       - name: Push Docker images to Docker Hub
         run: |
           docker-compose -f docker-compose.yml push
-        env:
-          MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_ROOT_PASSWORD }}
-          SPRING_DATASOURCE_PASSWORD: ${{ secrets.SPRING_DATASOURCE_PASSWORD }}
