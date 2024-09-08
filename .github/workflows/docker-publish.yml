@@ -23,11 +23,11 @@ jobs:
         uses: actions/setup-java@v2
         with:
           java-version: '17'
-          distribution: 'temurin'  # Specifies the JDK distribution
+          distribution: 'temurin'
           cache: maven
         
       - name: Build the project
-        run: cd Analytics && mvn clean package  # Ensure the JAR file is built
+        run: cd Data-Entry && mvn clean package
         
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
@@ -46,14 +46,6 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
         
-      - name: Build and push my-analytics image
-        uses: docker/build-push-action@v5
-        with:
-          context: ./Analytics
-          file: ./Analytics/Dockerfile
-          push: true
-          tags: ${{ secrets.DOCKER_USERNAME }}/my-analytics:latest
-          
       - name: Build and push data-entry image
         uses: docker/build-push-action@v5
         with:
@@ -61,6 +53,14 @@ jobs:
           file: ./Data-Entry/Dockerfile
           push: true
           tags: ${{ secrets.DOCKER_USERNAME }}/data-entry:latest
+          
+      - name: Build and push my-analytics image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./Analytics
+          file: ./Analytics/Dockerfile
+          push: true
+          tags: ${{ secrets.DOCKER_USERNAME }}/my-analytics:latest
           
       - name: Build and push my-show-data image
         uses: docker/build-push-action@v5
