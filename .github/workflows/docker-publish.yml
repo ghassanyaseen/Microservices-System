@@ -9,29 +9,25 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    
-    services:
-      docker:
-        image: docker:19.03.12
-        options: --privileged
-    
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-        
-      - name: Set up JDK 17 with Maven
+
+      - name: Set up JDK 17
         uses: actions/setup-java@v2
         with:
           java-version: '17'
           distribution: 'temurin'
           cache: maven
-        
-      - name: Build the project
-        run: cd Data-Entry && mvn clean package
-        
+
+      - name: Build Java projects with Maven
+        run: mvn clean package
+        working-directory: ./Analytics  # Adjust paths as needed for other projects
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
-        
+
       - name: Cache Docker layers
         uses: actions/cache@v3
         with:
@@ -45,35 +41,35 @@ jobs:
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
-        
-      - name: Build and push data-entry image
+
+      - name: Build and push Analytics image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./Analytics
+          file: ./Analytics/Dockerfile
+          push: true
+          tags: ${{ secrets.DOCKER_USERNAME }}/analytics:latest
+
+      - name: Build and push Data Entry image
         uses: docker/build-push-action@v5
         with:
           context: ./Data-Entry
           file: ./Data-Entry/Dockerfile
           push: true
           tags: ${{ secrets.DOCKER_USERNAME }}/data-entry:latest
-          
-      - name: Build and push my-analytics image
-        uses: docker/build-push-action@v5
-        with:
-          context: ./Analytics
-          file: ./Analytics/Dockerfile
-          push: true
-          tags: ${{ secrets.DOCKER_USERNAME }}/my-analytics:latest
-          
-      - name: Build and push my-show-data image
-        uses: docker/build-push-action@v5
-        with:
-          context: ./ShowData
-          file: ./ShowData/Dockerfile
-          push: true
-          tags: ${{ secrets.DOCKER_USERNAME }}/my-show-data:latest
-          
-      - name: Build and push my-authentication image
+
+      - name: Build and push Authentication image
         uses: docker/build-push-action@v5
         with:
           context: ./Authentication
           file: ./Authentication/Dockerfile
           push: true
-          tags: ${{ secrets.DOCKER_USERNAME }}/my-authentication:latest
+          tags: ${{ secrets.DOCKER_USERNAME }}/authentication:latest
+
+      - name: Build and push Show Data image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./ShowData
+          file: ./ShowData/Dockerfile
+          push: true
+          tags: ${{ secrets.DOCKER_USERNAME }}/show-data:latest
